@@ -1,0 +1,2 @@
+[0906/151535.420:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:108] CreateFile: Accès refusé. (0x5)
+[0906/151535.670:ERROR:third_party\crashpad\crashpad\util\win\registration_protocol_win.cc:108] CreateFile: Accès refusé. (0x5)
