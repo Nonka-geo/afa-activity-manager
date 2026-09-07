@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Dashboard</title></head>
+<body>
+    <main>
+        <h1>Dashboard</h1>
+        {% if active_school_year %}
+            <p>School year: {{ active_school_year.name }}</p>
+        {% else %}
+            <p>No active school year is configured.</p>
+        {% endif %}
+        <dl>
+            <dt>Total active activities</dt><dd>{{ total_activities }}</dd>
+            <dt>At Risk</dt><dd>{{ at_risk_count }}</dd>
+            <dt>Confirmed</dt><dd>{{ confirmed_count }}</dd>
+            <dt>Full</dt><dd>{{ full_count }}</dd>
+            <dt>Waiting List</dt><dd>{{ waiting_list_count }}</dd>
+        </dl>
+        <section>
+            <h2>Activities needing attention</h2>
+            <ul>
+                {% for activity in attention_activities %}
+                    <li><a href="{% url 'activities:detail' activity.pk %}">{{ activity.name }}</a></li>
+                {% empty %}<li>No activities need attention.</li>{% endfor %}
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

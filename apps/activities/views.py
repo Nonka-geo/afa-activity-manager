@@ -6,7 +6,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from .forms import ActivityForm, RegistrationUpdateForm
-from .models import Activity, ActivitySnapshot
+from .models import Activity, ActivitySnapshot, SchoolYear
+from .status import ActivityStatus
 
 
 class ActivityPermissionMixin(LoginRequiredMixin, PermissionRequiredMixin):
@@ -40,6 +41,46 @@ class ArchivedActivityListView(ActivityPermissionMixin, ListView):
 
     def get_queryset(self):
         return Activity.objects.filter(is_archived=True).select_related("school_year")
+
+
+class DashboardView(ActivityPermissionMixin, ListView):
+    model = Activity
+    permission_required = "activities.view_activity"
+    template_name = "activities/dashboard.html"
+    context_object_name = "activities"
+
+    def get_queryset(self):
+        active_year = SchoolYear.objects.filter(is_active=True).first()
+        if active_year is None:
+            return Activity.objects.none()
+        return Activity.objects.filter(
+            school_year=active_year,
+            is_archived=False,
+        ).select_related("school_year")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        active_year = SchoolYear.objects.filter(is_active=True).first()
+        activities = list(context["activities"])
+        status_counts = {status: 0 for status in ActivityStatus}
+        for activity in activities:
+            status_counts[activity.status] += 1
+        context.update(
+            {
+                "active_school_year": active_year,
+                "total_activities": len(activities),
+                "at_risk_count": status_counts[ActivityStatus.AT_RISK],
+                "confirmed_count": status_counts[ActivityStatus.CONFIRMED],
+                "full_count": status_counts[ActivityStatus.FULL],
+                "waiting_list_count": status_counts[ActivityStatus.WAITING_LIST],
+                "attention_activities": [
+                    activity
+                    for activity in activities
+                    if activity.status == ActivityStatus.AT_RISK
+                ],
+            }
+        )
+        return context
 
 
 class ActivityDetailView(ActivityPermissionMixin, DetailView):

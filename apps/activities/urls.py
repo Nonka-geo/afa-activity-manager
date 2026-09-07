@@ -6,6 +6,7 @@ from . import views
 app_name = "activities"
 
 urlpatterns = [
+    path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     path("", views.ActiveActivityListView.as_view(), name="list"),
     path("archived/", views.ArchivedActivityListView.as_view(), name="archived_list"),
     path("create/", views.ActivityCreateView.as_view(), name="create"),
