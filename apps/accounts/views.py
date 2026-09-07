@@ -3,11 +3,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render
 
 
-ADMIN_EDITOR_GROUP = "Admin/Editor"
-
-
-def is_admin_editor(user):
-    return user.is_authenticated and user.groups.filter(name=ADMIN_EDITOR_GROUP).exists()
+EDITOR_PERMISSION = "auth.access_editor_endpoint"
 
 
 @login_required
@@ -17,6 +13,6 @@ def home(request):
 
 @login_required
 def editor_check(request):
-    if not is_admin_editor(request.user):
+    if not request.user.has_perm(EDITOR_PERMISSION):
         return HttpResponseForbidden("Admin/Editor access required.")
     return render(request, "accounts/editor_check.html")

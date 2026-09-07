@@ -85,3 +85,13 @@ class AuthenticationAndRolesTests(TestCase):
         )
         self.assertTrue(self.editor.groups.filter(name="Admin/Editor").exists())
         self.assertTrue(self.viewer.groups.filter(name="Viewer").exists())
+
+    def test_editor_permission_is_assigned_only_to_admin_editor(self):
+        self.assertTrue(self.editor.has_perm("auth.access_editor_endpoint"))
+        self.assertFalse(self.viewer.has_perm("auth.access_editor_endpoint"))
+        self.assertTrue(
+            self.editor_group.permissions.filter(codename="access_editor_endpoint").exists()
+        )
+        self.assertFalse(
+            self.viewer_group.permissions.filter(codename="access_editor_endpoint").exists()
+        )
