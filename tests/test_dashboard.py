@@ -90,6 +90,17 @@ class DashboardTests(TestCase):
         self.assertEqual(response.context["waiting_list_count"], 0)
         self.assertContains(response, "No active school year is configured.")
 
+    def test_multiple_active_school_years_have_empty_state_and_zero_counts(self):
+        SchoolYear.objects.create(name="2028-2029", is_active=True)
+        self.create_activity("Ambiguous", 5)
+        self.client.force_login(self.viewer)
+
+        response = self.client.get(reverse("activities:dashboard"))
+
+        self.assertIsNone(response.context["active_school_year"])
+        self.assertEqual(response.context["total_activities"], 0)
+        self.assertContains(response, "No active school year is configured.")
+
     def test_dashboard_is_read_only(self):
         self.create_activity("Read Only", 5)
         self.client.force_login(self.viewer)

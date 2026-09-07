@@ -11,6 +11,13 @@ from .models import Activity, ActivitySnapshot, SchoolYear
 from .status import ActivityStatus
 
 
+def get_current_school_year():
+    active_years = SchoolYear.objects.filter(is_active=True)
+    if active_years.count() != 1:
+        return None
+    return active_years.first()
+
+
 class ActivityPermissionMixin(LoginRequiredMixin, PermissionRequiredMixin):
     raise_exception = True
 
@@ -31,7 +38,7 @@ class ActiveActivityListView(ActivityPermissionMixin, ListView):
     context_object_name = "activities"
 
     def get_queryset(self):
-        active_year = SchoolYear.objects.filter(is_active=True).first()
+        active_year = get_current_school_year()
         if active_year is None:
             return Activity.objects.none()
 
@@ -84,7 +91,7 @@ class DashboardView(ActivityPermissionMixin, ListView):
     context_object_name = "activities"
 
     def get_queryset(self):
-        active_year = SchoolYear.objects.filter(is_active=True).first()
+        active_year = get_current_school_year()
         if active_year is None:
             return Activity.objects.none()
         return Activity.objects.filter(
@@ -94,7 +101,7 @@ class DashboardView(ActivityPermissionMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        active_year = SchoolYear.objects.filter(is_active=True).first()
+        active_year = get_current_school_year()
         activities = list(context["activities"])
         status_counts = {status: 0 for status in ActivityStatus}
         for activity in activities:

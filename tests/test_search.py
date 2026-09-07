@@ -106,6 +106,16 @@ class ActivitySearchTests(TestCase):
         self.assertEqual(list(response.context["activities"]), [])
         self.assertContains(response, "No active activities.")
 
+    def test_multiple_active_years_return_empty_results(self):
+        SchoolYear.objects.create(name="2028-2029", is_active=True)
+        self.create_activity("Ambiguous")
+        self.client.force_login(self.viewer)
+
+        response = self.client.get(reverse("activities:list"))
+
+        self.assertEqual(list(response.context["activities"]), [])
+        self.assertContains(response, "No active activities.")
+
     def test_search_is_read_only(self):
         self.create_activity("Read Only")
         self.client.force_login(self.viewer)
