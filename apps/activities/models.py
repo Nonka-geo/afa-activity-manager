@@ -59,3 +59,8 @@ class Activity(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.group_code})"
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse("activities:detail", kwargs={"pk": self.pk})

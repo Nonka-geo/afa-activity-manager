@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Activities</title></head>
+<body>
+    <main>
+        <h1>Activities</h1>
+        <a href="{% url 'activities:archived_list' %}">Archived activities</a>
+        {% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">Create activity</a>{% endif %}
+        <ul>
+            {% for activity in activities %}
+                <li><a href="{% url 'activities:detail' activity.pk %}">{{ activity.name }}</a> - {{ activity.school_year }}</li>
+            {% empty %}<li>No active activities.</li>{% endfor %}
+        </ul>
+    </main>
+</body>
+</html>

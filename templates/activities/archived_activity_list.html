@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Archived activities</title></head>
+<body>
+    <main>
+        <h1>Archived activities</h1>
+        <a href="{% url 'activities:list' %}">Active activities</a>
+        <ul>
+            {% for activity in activities %}
+                <li><a href="{% url 'activities:detail' activity.pk %}">{{ activity.name }}</a> - {{ activity.school_year }}</li>
+            {% empty %}<li>No archived activities.</li>{% endfor %}
+        </ul>
+    </main>
+</body>
+</html>

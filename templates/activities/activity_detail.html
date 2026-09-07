@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>{{ activity.name }}</title></head>
+<body>
+    <main>
+        <h1>{{ activity.name }}</h1>
+        <dl>
+            <dt>Group code</dt><dd>{{ activity.group_code }}</dd>
+            <dt>Schedule</dt><dd>{{ activity.schedule }}</dd>
+            <dt>Provider</dt><dd>{{ activity.provider }}</dd>
+            <dt>Age group</dt><dd>{{ activity.age_group }}</dd>
+            <dt>Space</dt><dd>{{ activity.space }}</dd>
+            <dt>Price</dt><dd>{{ activity.price }}</dd>
+            <dt>Minimum</dt><dd>{{ activity.minimum_participants }}</dd>
+            <dt>Maximum</dt><dd>{{ activity.maximum_participants }}</dd>
+            <dt>Registrations</dt><dd>{{ activity.registration_count }}</dd>
+            <dt>School year</dt><dd>{{ activity.school_year }}</dd>
+            <dt>Archived</dt><dd>{{ activity.is_archived }}</dd>
+        </dl>
+        {% if perms.activities.change_activity %}<a href="{% url 'activities:edit' activity.pk %}">Edit</a>{% endif %}
+        {% if perms.activities.change_activity and not activity.is_archived %}
+            <a href="{% url 'activities:archive' activity.pk %}">Archive</a>
+        {% endif %}
+    </main>
+</body>
+</html>

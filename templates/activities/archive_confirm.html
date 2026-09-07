@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Archive activity</title></head>
+<body>
+    <main>
+        <h1>Archive {{ activity.name }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Archive</button>
+        </form>
+    </main>
+</body>
+</html>
