@@ -74,3 +74,22 @@ class Activity(models.Model):
         from django.urls import reverse
 
         return reverse("activities:detail", kwargs={"pk": self.pk})
+
+
+class ActivitySnapshot(models.Model):
+    activity = models.ForeignKey(
+        Activity,
+        on_delete=models.CASCADE,
+        related_name="snapshots",
+    )
+    actor = models.ForeignKey(
+        "auth.User",
+        on_delete=models.PROTECT,
+        related_name="activity_snapshots",
+    )
+    registration_count = models.PositiveIntegerField()
+    status = models.CharField(max_length=20)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at", "-pk"]

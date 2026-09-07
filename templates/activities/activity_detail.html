@@ -19,6 +19,7 @@
             <dt>Archived</dt><dd>{{ activity.is_archived }}</dd>
         </dl>
         {% if perms.activities.change_activity %}<a href="{% url 'activities:edit' activity.pk %}">Edit</a>{% endif %}
+        {% if perms.activities.change_activity %}<a href="{% url 'activities:registrations' activity.pk %}">Update registrations</a>{% endif %}
         {% if perms.activities.change_activity and not activity.is_archived %}
             <a href="{% url 'activities:archive' activity.pk %}">Archive</a>
         {% endif %}

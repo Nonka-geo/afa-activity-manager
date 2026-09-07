@@ -1,11 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
-from .forms import ActivityForm
-from .models import Activity
+from .forms import ActivityForm, RegistrationUpdateForm
+from .models import Activity, ActivitySnapshot
 
 
 class ActivityPermissionMixin(LoginRequiredMixin, PermissionRequiredMixin):
@@ -65,6 +66,50 @@ class ActivityUpdateView(ActivityPermissionMixin, SuccessMessageMixin, UpdateVie
     permission_required = "activities.change_activity"
     template_name = "activities/activity_form.html"
     success_message = "Activity updated."
+
+    def get_success_url(self):
+        return self.object.get_absolute_url()
+
+
+class RegistrationUpdateView(ActivityPermissionMixin, UpdateView):
+    model = Activity
+    form_class = RegistrationUpdateForm
+    permission_required = "activities.change_activity"
+    template_name = "activities/registration_form.html"
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            activity = Activity.objects.select_for_update().get(pk=self.object.pk)
+            previous_values = (
+                activity.registration_count,
+                activity.minimum_participants,
+                activity.maximum_participants,
+            )
+            activity.registration_count = form.cleaned_data["registration_count"]
+            activity.minimum_participants = form.cleaned_data["minimum_participants"]
+            activity.maximum_participants = form.cleaned_data["maximum_participants"]
+            current_values = (
+                activity.registration_count,
+                activity.minimum_participants,
+                activity.maximum_participants,
+            )
+            if current_values != previous_values:
+                activity.full_clean()
+                activity.save(
+                    update_fields=[
+                        "registration_count",
+                        "minimum_participants",
+                        "maximum_participants",
+                    ]
+                )
+                ActivitySnapshot.objects.create(
+                    activity=activity,
+                    actor=self.request.user,
+                    registration_count=activity.registration_count,
+                    status=str(activity.status),
+                )
+            self.object = activity
+        return super().form_valid(form)
 
     def get_success_url(self):
         return self.object.get_absolute_url()

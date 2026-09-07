@@ -19,3 +19,13 @@ class ActivityForm(forms.ModelForm):
             "school_year",
             "notes",
         ]
+
+
+class RegistrationUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = [
+            "registration_count",
+            "minimum_participants",
+            "maximum_participants",
+        ]
