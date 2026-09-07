@@ -6,6 +6,16 @@
         <h1>Activities</h1>
         <a href="{% url 'activities:archived_list' %}">Archived activities</a>
         {% if perms.activities.add_activity %}<a href="{% url 'activities:create' %}">Create activity</a>{% endif %}
+        <form method="get">
+            <label>Search <input name="q" value="{{ request.GET.q }}"></label>
+            <label>Schedule <input name="schedule" value="{{ request.GET.schedule }}"></label>
+            <label>Provider <input name="provider" value="{{ request.GET.provider }}"></label>
+            <label>Space <input name="space" value="{{ request.GET.space }}"></label>
+            <label>Age group <input name="age_group" value="{{ request.GET.age_group }}"></label>
+            <label>School year <input name="school_year" value="{{ request.GET.school_year }}"></label>
+            <label>Status <input name="status" value="{{ request.GET.status }}"></label>
+            <button type="submit">Filter</button>
+        </form>
         <ul>
             {% for activity in activities %}
                 <li><a href="{% url 'activities:detail' activity.pk %}">{{ activity.name }}</a> - {{ activity.school_year }} - {{ activity.status }}</li>

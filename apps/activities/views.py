@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -30,7 +31,40 @@ class ActiveActivityListView(ActivityPermissionMixin, ListView):
     context_object_name = "activities"
 
     def get_queryset(self):
-        return Activity.objects.filter(is_archived=False).select_related("school_year")
+        active_year = SchoolYear.objects.filter(is_active=True).first()
+        if active_year is None:
+            return Activity.objects.none()
+
+        queryset = Activity.objects.filter(
+            school_year=active_year,
+            is_archived=False,
+        ).select_related("school_year")
+        query = self.request.GET.get("q", "").strip()
+        if query:
+            queryset = queryset.filter(
+                Q(name__icontains=query)
+                | Q(schedule__icontains=query)
+                | Q(provider__icontains=query)
+                | Q(age_group__icontains=query)
+                | Q(space__icontains=query)
+            )
+
+        for field_name in ("schedule", "provider", "space", "age_group"):
+            value = self.request.GET.get(field_name, "").strip()
+            if value:
+                queryset = queryset.filter(**{f"{field_name}__iexact": value})
+
+        school_year = self.request.GET.get("school_year", "").strip()
+        if school_year and school_year.lower() != active_year.name.lower():
+            return Activity.objects.none()
+
+        status = self.request.GET.get("status", "").strip()
+        if status:
+            valid_statuses = {str(status_value) for status_value in ActivityStatus}
+            if status not in valid_statuses:
+                return Activity.objects.none()
+            queryset = [activity for activity in queryset if str(activity.status) == status]
+        return queryset
 
 
 class ArchivedActivityListView(ActivityPermissionMixin, ListView):

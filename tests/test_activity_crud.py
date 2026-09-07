@@ -10,7 +10,7 @@ from apps.activities.models import Activity, SchoolYear
 class ActivityCrudTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.school_year = SchoolYear.objects.create(name="2026-2027")
+        cls.school_year = SchoolYear.objects.create(name="2026-2027", is_active=True)
         cls.active_activity = Activity.objects.create(
             name="Art Club",
             schedule="Tuesday 15:30",

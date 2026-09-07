@@ -69,7 +69,7 @@ class ActivityStatusTests(TestCase):
         self.assertNotIn("status", field_names)
 
     def test_activity_views_render_derived_status(self):
-        school_year = SchoolYear.objects.create(name="2028-2029")
+        school_year = SchoolYear.objects.create(name="2028-2029", is_active=True)
         activity = Activity.objects.create(
             name="Science Club",
             schedule="Wednesday 15:30",
