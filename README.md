@@ -8,6 +8,12 @@ Install the project dependencies with uv:
 uv sync
 ```
 
+Initialize the local database and create the built-in application roles:
+
+```text
+uv run python manage.py migrate
+```
+
 Run Django checks and tests:
 
 ```text
