@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from .status import calculate_status
+
 
 class SchoolYear(models.Model):
     name = models.CharField(max_length=20, unique=True)
@@ -59,6 +61,14 @@ class Activity(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.group_code})"
+
+    @property
+    def status(self):
+        return calculate_status(
+            self.registration_count,
+            self.minimum_participants,
+            self.maximum_participants,
+        )
 
     def get_absolute_url(self):
         from django.urls import reverse
